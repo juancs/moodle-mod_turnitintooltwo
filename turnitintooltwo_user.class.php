@@ -31,6 +31,10 @@ class turnitintooltwo_user {
     private $usermessages;
     private $instructorrubrics;
 
+    /// uji: need user idnumber too
+    private $idnumber;
+    /// uji: end
+
     public function __construct($id, $role = "Learner", $enrol = true, $workflowcontext = "site", $finduser = true) {
         $this->id = $id;
         $this->set_user_role($role);
@@ -42,6 +46,10 @@ class turnitintooltwo_user {
         $this->fullname = "";
         $this->email = "";
         $this->username = "";
+
+        /// uji: need idnumber too
+        $this->idnumber = "";
+        /// uji: end
 
         if ($id != 0) {
             $this->get_moodle_user($this->id);
@@ -106,6 +114,10 @@ class turnitintooltwo_user {
         $this->email = trim(html_entity_decode($user->email));
         $this->username = $user->username;
 
+        /// uji: need idnumber too
+        $this->idnumber = $user->idnumber;
+        /// uji: end
+
         $turnitintooltwouser = $DB->get_record('turnitintooltwo_users', array('userid' => $this->id));
 
         $this->instructorrubrics = array();
@@ -134,9 +146,13 @@ class turnitintooltwo_user {
      * @return string A pseudo firstname address
      */
     private function get_pseudo_firstname() {
+        /// uji: pseudonimize firstname based on firstname and salt
         $config = turnitintooltwo_admin_config();
-
+        return sha1($config->pseudosalt + $this->idnumber);
+        /*
         return !empty( $config->pseudofirstname ) ? $config->pseudofirstname : TURNITINTOOLTWO_DEFAULT_PSEUDO_FIRSTNAME;
+         */
+        /// uji: end
     }
 
     /**
@@ -146,6 +162,11 @@ class turnitintooltwo_user {
      * @return string A pseudo lastname address
      */
     private function get_pseudo_lastname() {
+        /// uji: pseudonimize lastname based on lastname and salt
+        $config = turnitintooltwo_admin_config();
+        return sha1($config->pseudosalt + $this->idnumber);
+        /// uji: fin
+        /*
         global $DB;
         $config = turnitintooltwo_admin_config();
         $userinfo = $DB->get_record('user_info_data', array('userid' => $this->id, 'fieldid' => $config->pseudolastname));
@@ -168,6 +189,7 @@ class turnitintooltwo_user {
             $uniqueid = get_string('user');
         }
         return $uniqueid;
+         */
     }
 
     /**
