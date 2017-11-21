@@ -234,10 +234,19 @@ class turnitintooltwo_user {
         if (!empty($config->enablepseudo) && $this->role == "Learner") {
             $user = new TiiPseudoUser($this->get_pseudo_domain());
             $user->setPseudoSalt($config->pseudosalt);
+            /// uji: obfuscate email
+            $decoupled_user = local_plagiarism_get_decoupled_user($this->moodleuser);
+            $user->setEmail($decoupled_user->email);
+            /// uji: fin
         } else {
             $user = new TiiUser();
+            /// uji: obfuscate email
+            $user->setEmail($this->email);
+            /// uji: fin
         }
-        $user->setEmail($this->email);
+        /// uji: email must be obduscated
+        //$user->setEmail($this->email);
+        /// uji: fin
 
         try {
             $response = $turnitincall->findUser($user);
