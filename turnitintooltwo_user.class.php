@@ -235,6 +235,8 @@ class turnitintooltwo_user {
             $user = new TiiPseudoUser($this->get_pseudo_domain());
             $user->setPseudoSalt($config->pseudosalt);
             /// uji: obfuscate email
+            global $CFG;
+            require_once($CFG->dirroot . '/local/plagiarism/locallib.php');
             $decoupled_user = local_plagiarism_get_decoupled_user($this->moodleuser);
             $user->setEmail($decoupled_user->email);
             /// uji: fin
@@ -284,13 +286,22 @@ class turnitintooltwo_user {
             $user->setPseudoSalt($config->pseudosalt);
             $user->setFirstName($this->get_pseudo_firstname());
             $user->setLastName($this->get_pseudo_lastname());
+            /// uji: obfuscate email
+            global $CFG;
+            require_once($CFG->dirroot . '/local/plagiarism/locallib.php');
+            $decoupled_user = local_plagiarism_get_decoupled_user($this->moodleuser);
+            $user->setEmail($decoupled_user->email);
+            /// uji: fin
         } else {
             $user = new TiiUser();
             $user->setFirstName($this->firstname);
             $user->setLastName($this->lastname);
+            $user->setEmail($this->email);
         }
 
-        $user->setEmail($this->email);
+        /// uji: obfuscate email
+        //$user->setEmail($this->email);
+        /// uji: fin
         $user->setDefaultRole($this->role);
 
         try {
