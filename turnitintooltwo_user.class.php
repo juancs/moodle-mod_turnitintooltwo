@@ -31,8 +31,8 @@ class turnitintooltwo_user {
     private $usermessages;
     private $instructorrubrics;
 
-    /// uji: need user idnumber too
-    private $idnumber;
+    /// uji: need $moodleuser
+    private $moodleuser;
     /// uji: end
 
     public function __construct($id, $role = "Learner", $enrol = true, $workflowcontext = "site", $finduser = true) {
@@ -47,12 +47,12 @@ class turnitintooltwo_user {
         $this->email = "";
         $this->username = "";
 
-        /// uji: need idnumber too
-        $this->idnumber = "";
+        /// uji: we need moodleuser
+        $this->moodleuser = null;
         /// uji: end
 
         if ($id != 0) {
-            $this->get_moodle_user($this->id);
+            $this->moodleuser = $this->get_moodle_user($this->id);
             if ($finduser === true) {
                 $this->get_tii_user_id();
             }
@@ -114,10 +114,6 @@ class turnitintooltwo_user {
         $this->email = trim(html_entity_decode($user->email));
         $this->username = $user->username;
 
-        /// uji: need idnumber too
-        $this->idnumber = $user->idnumber;
-        /// uji: end
-
         $turnitintooltwouser = $DB->get_record('turnitintooltwo_users', array('userid' => $this->id));
 
         $this->instructorrubrics = array();
@@ -147,8 +143,8 @@ class turnitintooltwo_user {
      */
     private function get_pseudo_firstname() {
         /// uji: pseudonimize firstname based on firstname and salt
-        $config = turnitintooltwo_admin_config();
-        return sha1($config->pseudosalt + $this->idnumber);
+        $user = local_plagiarism_get_decoupled_user($this->moodleuser);
+        return $user->firstname;
         /*
         return !empty( $config->pseudofirstname ) ? $config->pseudofirstname : TURNITINTOOLTWO_DEFAULT_PSEUDO_FIRSTNAME;
          */
@@ -163,8 +159,8 @@ class turnitintooltwo_user {
      */
     private function get_pseudo_lastname() {
         /// uji: pseudonimize lastname based on lastname and salt
-        $config = turnitintooltwo_admin_config();
-        return sha1($config->pseudosalt + $this->idnumber);
+        $user = local_plagiarism_get_decoupled_user($this->moodleuser);
+        return $user->lastname;
         /// uji: fin
         /*
         global $DB;
