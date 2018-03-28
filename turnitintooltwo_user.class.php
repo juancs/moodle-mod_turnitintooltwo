@@ -16,6 +16,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/// uji: funciones comunes antiplagio
+require_once($CFG->dirroot . '/local/plagiarism/locallib.php');
+/// uji: fin
+
 class turnitintooltwo_user {
     public $id;
     public $tiiuserid;
@@ -262,6 +266,10 @@ class turnitintooltwo_user {
             $tiiuserid = $finduser->getUserId();
             if (empty($tiiuserid)) {
                 $tiiuserid = null;
+            } else {
+                /// uji: insertar
+                local_plagiarism_add_turnitin_user($this->id, $this->role, $tiiuserid);
+                /// uji: fin
             }
             return $tiiuserid;
 
@@ -402,7 +410,6 @@ class turnitintooltwo_user {
         if ($this->role == "Instructor") {
             $user->turnitin_utp = 2;
         }
-
         /// uji: disociación.
         $turnitintooltwouser = local_plagiarism_get_turnitin_real_user($this->id, $this->role);
         /// fin
