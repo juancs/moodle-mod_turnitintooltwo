@@ -114,7 +114,10 @@ class turnitintooltwo_user {
         $this->email = trim(html_entity_decode($user->email));
         $this->username = $user->username;
 
-        $turnitintooltwouser = $DB->get_record('turnitintooltwo_users', array('userid' => $this->id));
+        /// uji:
+        $turnitintooltwouser = local_plagiarism_get_turnitin_real_user($this->id, $this->role);
+        //$turnitintooltwouser = $DB->get_record('turnitintooltwo_users', array('userid' => $this->id));
+        /// uji: fin
 
         $this->instructorrubrics = array();
         if (!empty($turnitintooltwouser->instructor_rubrics)) {
@@ -198,7 +201,10 @@ class turnitintooltwo_user {
      */
     private function get_tii_user_id() {
         global $DB;
-        $tiiuser = $DB->get_record("turnitintooltwo_users", array("userid" => $this->id), "turnitin_uid, user_agreement_accepted");
+        /// uji: disociación
+        $tiiuser = local_plagiarism_get_turnitin_real_user($this->id, $this->role);
+        //$tiiuser = $DB->get_record("turnitintooltwo_users", array("userid" => $this->id), "turnitin_uid, user_agreement_accepted");
+        /// uji: fin
         if (!$tiiuser) {
             $this->tiiuserid = 0;
             $this->useragreementaccepted = 0;
@@ -311,6 +317,15 @@ class turnitintooltwo_user {
 
             turnitintooltwo_activitylog("Turnitin User created: ".$this->id." (".$tiiuserid.")", "REQUEST");
 
+            /// uji: insertamos la asociación en la tabla de mapeos
+            global $DB;
+            $r = new \stdClass();
+            $r->userid = $this->moodleuser->id;
+            $r->tiiuserid = $tiiuserid;
+            $r->role = $this->role;
+            $DB->insert_record('local_plagiarism_turnitin', $r);
+            /// uji: fin
+
             return $tiiuserid;
 
         } catch (Exception $e) {
@@ -388,7 +403,10 @@ class turnitintooltwo_user {
             $user->turnitin_utp = 2;
         }
 
-        if ($turnitintooltwouser = $DB->get_record("turnitintooltwo_users", array("userid" => $this->id))) {
+        /// uji: disociación.
+        $turnitintooltwouser = local_plagiarism_get_turnitin_real_user($this->id, $this->role);
+        /// fin
+        if ($turnitintooltwouser) {
             $user->id = $turnitintooltwouser->id;
             $user->turnitin_utp = $turnitintooltwouser->turnitin_utp;
             if ((!$DB->update_record('turnitintooltwo_users', $user))) {
@@ -540,7 +558,10 @@ class turnitintooltwo_user {
             $rubricarray[$rubric->getRubricId()] = $rubric->getRubricName();
         }
 
-        if ($turnitintooltwouser = $DB->get_record("turnitintooltwo_users", array("userid" => $this->id))) {
+        /// uji: popo
+        $turnitintooltwouser = local_plagiarism_get_turnitin_real_user($this->id, $this->role);
+        /// uji: fin
+        if ($turnitintooltwouser) {
             $turnitintooltwouser->id = $turnitintooltwouser->id;
             $turnitintooltwouser->instructor_rubrics = json_encode($rubricarray);
             $DB->update_record('turnitintooltwo_users', $turnitintooltwouser);
@@ -606,7 +627,10 @@ class turnitintooltwo_user {
             }
         }
 
-        $turnitintooltwouser = $DB->get_record("turnitintooltwo_users", array("userid" => $this->id), "id");
+        /// uji: disociación
+        $turnitintooltwouser = local_plagiarism_get_turnitin_real_user($this->id, $this->role);
+        //$turnitintooltwouser = $DB->get_record("turnitintooltwo_users", array("userid" => $this->id), "id");
+        /// uji: fin
         $turnitintooltwouser->instructor_defaults = json_encode($instructordefaults);
         $DB->update_record('turnitintooltwo_users', $turnitintooltwouser);
     }
@@ -619,7 +643,10 @@ class turnitintooltwo_user {
      */
     public function get_instructor_defaults() {
         global $DB;
-        $turnitintooltwouser = $DB->get_record('turnitintooltwo_users', array('userid' => $this->id));
+        /// uji: disociación
+        $turnitintooltwouser = local_plagiarism_get_turnitin_real_user($this->id, $this->role);
+        //$turnitintooltwouser = $DB->get_record('turnitintooltwo_users', array('userid' => $this->id));
+        /// uji: fin
         $instructordefaults = array();
 
         if (!empty($turnitintooltwouser->instructor_defaults)) {
@@ -648,7 +675,10 @@ class turnitintooltwo_user {
             $readuser = $response->getUser();
 
             if ($readuser->getAcceptedUserAgreement()) {
-                $turnitintooltwouser = $DB->get_record('turnitintooltwo_users', array('userid' => $this->id));
+                /// uji: disociación
+                $turnitintooltwouser = local_plagiarism_get_turnitin_real_user($this->id, $this->role);
+                //$turnitintooltwouser = $DB->get_record('turnitintooltwo_users', array('userid' => $this->id));
+                /// uji: fin
 
                 $tiiuserinfo = new stdClass();
                 $tiiuserinfo->id = $turnitintooltwouser->id;
